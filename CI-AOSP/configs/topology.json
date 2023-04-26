@@ -1,0 +1,56 @@
+{
+  "boards": {
+    "1": {
+      "name": "raspberry-pi3",
+      "ip_addr": "10.0.0.100",
+      "account": "root",
+      "reset_device": "1",
+      "serial": "1",
+      "sdmux": "1"
+    }
+  },
+  "servers": {
+    "153": {
+      "host_addr": "192.168.5.153",
+      "user_name": "hailc4",
+      "password": "234"
+    }
+  },
+  "reset_devices": {
+    "1": {
+      "relay": "1",
+      "port": "1"
+    },
+    "2": {
+      "relay": "1",
+      "port": "2"
+    },
+    "3": {
+      "relay": "1",
+      "port": "3"
+    },
+    "4": {
+      "relay": "1",
+      "port": "4"
+    }
+  },
+  "relays": {
+    "1":{
+      "server": "153",
+      "name": "HW341"
+    }
+  },
+  "serials": {
+    "1": {
+      "server": "153",
+      "device": "/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0",
+      "port": "10001"
+    }
+  },
+  "sdmux": {
+    "1": {
+      "server": "153",
+      "device": "/dev/usb-sd-mux/id-000000000744"
+    }
+  }
+}
