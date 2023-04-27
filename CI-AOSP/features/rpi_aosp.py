@@ -28,8 +28,18 @@ class rpi_aosp():
         log_sw = open(f'{log_path}/switch.txt', 'w+')
         self.reset = Reset_device(reset_id_js=board_conf["reset_device"], log_file=log_reset)
         self.switch = switch_sd(sdmux_id=board_conf["sdmux"], log_file=log_sw)
-        self.serial_ter = serial_ter(serial_id=board_conf["serial"], log_file=log_serial).telnet_com()
         self.server = Ssh_tool(Configs().get_topology()["servers"][server_id])
+        self.serial_ter = serial_ter(serial_id=board_conf["serial"], log_file=log_serial).picocom_ter()
+        # setup dhcp server
+        print("setup dhcp server")
+        self.reset.power_on()
+        sleep(5)
+        ter_tmp = self.server.create_ter()
+        self.server.root_cmd(ter_tmp, "sudo systemctl restart isc-dhcp-server.service", [ter_tmp.PROMPT])
+        sleep(1)
+        ter_tmp.close()
+
+
 
     def startup_config(self):
         print("config adb for board")

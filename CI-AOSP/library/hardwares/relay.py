@@ -4,33 +4,24 @@ from time import sleep
 import pexpect
 
 from library.configs import Configs
-from library.terminal.tool_ssh import  Ssh_raw
+from library.terminal.tool_ssh import  Ssh_tool
 
 
-class Relay(Ssh_raw):
+class Relay(Ssh_tool):
     def __init__(self, server, device_id, log_file=sys.stdout):
         super().__init__(server)
         self.ter = self.create_ter(log_file)
         self.ID = device_id
         self.wait_time = 1
-        try:
-            i = self.ter.send_expect(f"sudo hidusb-relay-cmd state", ["password", self.ID])
-            if i == 0:
-                self.ter.sendline(self.password)
-            self.ter.prompt()
-            print(f"relay available")
-        except pexpect.ExceptionPexpect as ex:
-            self.ter.prompt()
-            raise ex
+        self.root_cmd(self.ter, f"sudo hidusb-relay-cmd state", [self.ID])
+        print(f"relay available")
 
     def p_off(self, port):
-        self.ter.sendline(f"sudo hidusb-relay-cmd ID={self.ID} OFF {port}")
-        self.ter.prompt()
+        self.root_cmd(self.ter, f"sudo hidusb-relay-cmd ID={self.ID} OFF {port}", [self.ter.PROMPT])
         sleep(self.wait_time)
 
     def p_on(self, port):
-        self.ter.sendline(f"sudo hidusb-relay-cmd ID={self.ID} ON {port}")
-        self.ter.prompt()
+        self.root_cmd(self.ter, f"sudo hidusb-relay-cmd ID={self.ID} ON {port}", [self.ter.PROMPT])
         sleep(self.wait_time)
 
 

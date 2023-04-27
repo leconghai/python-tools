@@ -14,43 +14,19 @@ class SDmux(Ssh_tool):
         self.ID = device_file
         self.wait_time = 1
         self.wait_mount = 3
-        try:
-            self.ter.sendline(f"sudo usbsdmux {self.ID} get")
-            i = self.ter.expect(["password", "dut", "host", "off"])
-            if i == 0:
-                self.ter.sendline(self.password)
-                self.ter.expect(["dut", "host", "off"])
-            print(f"sdmux available")
-        except pexpect.ExceptionPexpect as ex:
-            self.ter.prompt()
-            raise ex
+        self.root_cmd(self.ter, f"sudo usbsdmux {self.ID} get", ["password", "dut", "host", "off"])
+        print(f"sdmux available")
 
     def mode_dut(self):
-        self.ter.sendline(f"sudo usbsdmux {self.ID} dut")
-        i = self.ter.expect(["password", self.ter.PROMPT])
-        if i == 0:
-            self.ter.sendline(self.password)
-            self.ter.prompt()
+        self.root_cmd(self.ter, f"sudo usbsdmux {self.ID} dut", [self.ter.PROMPT])
         sleep(self.wait_time)
-        self.ter.sendline(f"sudo usbsdmux {self.ID} get")
-        self.ter.prompt()
-        if "dut" not in self.ter.before:
-            print("sdmux set dut faild")
-            return None
+        self.root_cmd(self.ter, f"sudo usbsdmux {self.ID} get", ["dut"])
         sleep(self.wait_mount)
 
     def mode_host(self):
-        self.ter.sendline(f"sudo usbsdmux {self.ID} host")
-        i = self.ter.expect(["password", self.ter.PROMPT])
-        if i == 0:
-            self.ter.sendline(self.password)
-            self.ter.prompt()
+        self.root_cmd(self.ter, f"sudo usbsdmux {self.ID} host", [self.ter.PROMPT])
         sleep(self.wait_time)
-        self.ter.sendline(f"sudo usbsdmux {self.ID} get")
-        self.ter.prompt()
-        if "host" not in self.ter.before:
-            print("sdmux set host faild")
-            return None
+        self.root_cmd(self.ter, f"sudo usbsdmux {self.ID} get", ["host"])
         sleep(self.wait_mount)
 
 

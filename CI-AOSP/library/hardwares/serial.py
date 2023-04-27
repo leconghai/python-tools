@@ -12,14 +12,8 @@ class Serial(Ssh_raw):
         self.ter = self.create_ter(log_file)
 
     def picocom(self, device):
-        try:
-            self.ter.send_expect(f"sudo picocom -b 115200 {device}", f"password")
-            self.ter.send_expect(f"{self.password}", f"Terminal ready")
-            print(f"Serial available")
-        except pexpect.ExceptionPexpect:
-            print(f"Serial not available")
-            self.ter.close()
-            return None
+        self.root_cmd(self.ter, f"sudo picocom -b 115200 {device}", ["Terminal ready"])
+        print(f"Serial available")
         return self.ter
 
     def telnet(self, port):

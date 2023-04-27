@@ -16,9 +16,22 @@ class Ssh_tool:
             ter.login(self.host_addr, self.user_name, self.password)
         except pxssh.ExceptionPexpect as ex:
             raise ex
-            # print(str(ex))
-            # return None
         return ter
+
+    def root_cmd(self, ter, command, expects=None):
+        list_expect = ["password"]
+        if expects is not None:
+            list_expect.extend(expects)
+        try:
+            ter.sendline(command)
+            i = ter.expect(list_expect)
+            if i == 0:
+                ter.sendline(self.password)
+                if expects is not None:
+                    ter.expect(expects)
+        except pexpect.ExceptionPexpect as ex:
+            self.ter.prompt()
+            raise ex
 
 
 class Ssh_raw:
@@ -32,23 +45,38 @@ class Ssh_raw:
         try:
             ter.sendline(f"ssh {self.user_name}@{self.host_addr}")
             ssh_newkey = 'Are you sure you want to continue connecting'
-            # i = ter.expect([ssh_newkey, 'password:'])
-            # if i == 0:
-            #     ter.sendline('yes')
-            i = ter.expect([ssh_newkey, 'password:'])
-            if i == 1:
+            i = ter.expect(['password:', ssh_newkey])
+            if i == 0:
                 ter.sendline(self.password)
+            elif i == 1:
+                ter.sendline('yes')
+                i = ter.expect(['password:'])
+                if i == 0:
+                    ter.sendline(self.password)
         except pexpect.ExceptionPexpect as ex:
             raise ex
-            # print(str(ex))
-            # return None
         return ter
+
+    def root_cmd(self, ter, command, expects=None):
+        list_expect = ["password"]
+        if expects is not None:
+            list_expect.extend(expects)
+        try:
+            ter.sendline(command)
+            i = ter.expect(list_expect)
+            if i == 0:
+                ter.sendline(self.password)
+                if expects is not None:
+                    ter.expect(expects)
+        except pexpect.ExceptionPexpect as ex:
+            self.ter.prompt()
+            raise ex
 
 
 class Terminal(spawn):
     def prompt(self):
         try:
-            self.expect("-------------", timeout=1)
+            self.expect("XXXXXXXXXXXXX", timeout=1)
         except pexpect.ExceptionPexpect:
             pass
 
