@@ -13,9 +13,10 @@ DIR_OUT = f"{DIR}/../logfile/"
 
 if __name__ == '__main__':
     board_rpi_aosp = rpi_aosp(board_id="1", server_id="153")
+
     while 1:
         mode = ""
-        print("all,flash,setup,on,off")
+        print("all,flash,setup,kernel")
         mode = input("enter mode:")
         match mode:
             case "flash":
@@ -29,6 +30,10 @@ if __name__ == '__main__':
                 board_rpi_aosp.reset.power_on()
             case "off":
                 board_rpi_aosp.reset.power_off()
+            case "kernel":
+                board_rpi_aosp.build_kernel()
+                board_rpi_aosp.flash_all_image()
+                board_rpi_aosp.startup_config()
             case "q":
                 print("quit program")
                 break
