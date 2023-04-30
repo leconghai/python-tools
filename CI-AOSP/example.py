@@ -2,7 +2,7 @@ import sys
 from time import sleep
 
 
-from features.rpi_aosp import rpi_aosp
+from features.rpi_aosp.rpi_aosp import rpi_aosp
 
 DIR = sys.path[0]
 DIR_OUT = f"{DIR}/../logfile/"

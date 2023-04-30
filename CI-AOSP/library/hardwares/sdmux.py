@@ -1,10 +1,6 @@
 import sys
 from time import sleep
-
-import pexpect
-
-from library.configs import Configs
-from library.terminal.tool_ssh import Ssh_raw, Ssh_tool
+from library.terminal.tool_ssh import Ssh_tool
 
 
 class SDmux(Ssh_tool):
@@ -28,10 +24,3 @@ class SDmux(Ssh_tool):
         sleep(self.wait_time)
         self.root_cmd(self.ter, f"sudo usbsdmux {self.ID} get", ["host"])
         sleep(self.wait_mount)
-
-
-class switch_sd(SDmux):
-    def __init__(self, sdmux_id, log_file=sys.stdout):
-        sdmux_conf = Configs().get_topology()["sdmux"][sdmux_id]
-        server = Configs().get_topology()["servers"][sdmux_conf["server"]]
-        super().__init__(server, sdmux_conf["device"], log_file)

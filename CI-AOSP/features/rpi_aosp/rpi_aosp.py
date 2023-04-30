@@ -1,21 +1,19 @@
 import os
 import sys
-from time import sleep, time
+from time import sleep
 import pexpect
+
+from features.rpi_aosp.topology import Reset_device, switch_sd, serial_ter
 from library.configs import Configs
-from library.hardwares.relay import Reset_device
-from library.hardwares.sdmux import switch_sd
-from library.hardwares.serial import serial_ter
 from library.terminal.tool_ssh import Ssh_raw
 
 DIR = sys.path[0]
 DIR_OUT = f"{DIR}/out"
 
 
-class rpi_aosp():
+class rpi_aosp:
     def __init__(self, board_id, server_id, log_path=None):
         board_conf = Configs().get_topology()["boards"][board_id]
-        self.aosp_conf = Configs().get_aosp_pi3()
         self.name = board_conf["name"]
         self.ip_addr = board_conf["ip_addr"]
         self.account = board_conf["account"]
@@ -54,7 +52,7 @@ class rpi_aosp():
         server_ter.send_expect("cdkernel", "pi3/kernel/rpi")
         cmd = f"scripts/kconfig/merge_config.sh arch/arm/configs/bcm2709_defconfig kernel/configs/android-base.config " \
               f"kernel/configs/android-recommended.config"
-        server_ter.send_expect(cmd, "CONFIG_ENABLE_DEFAULT_TRACERS", timeout=20)
+        server_ter.send_expect(cmd, "CONFIG_ENABLE_DEFAULT_TRACERS", timeout=60)
         sleep(2)
         server_ter.send_expect("make -j 6 zImage", "zImage is ready", timeout=60)
         server_ter.sendline("make dtbs")
@@ -68,7 +66,7 @@ class rpi_aosp():
         server_ter.send_expect("cdaosp", "/pi3")
         server_ter.sendline("source build/envsetup.sh")
         sleep(5)
-        server_ter.send_expect("lunch aosp_rpi3-eng", "OUT_DIR=out", timeout=-1)
+        server_ter.send_expect("lunch aosp_rpi3-eng", "OUT_DIR=out", timeout=600)
         sleep(2)
         server_ter.send_expect("make bootimage -j 6", "build completed successfully", timeout=600)
         server_ter.sendline("sync")
@@ -117,22 +115,22 @@ class rpi_aosp():
         print("init server terminal")
         log_server = open(f'{log_path}/server.txt', 'w+')
         server_ter = self.server.create_ter(log_server)
-        path = self.aosp_conf['path']['root']
+        path = "/storage/workspace/source/aosp/pi3"
         print(f"move path: {path}")
         server_ter.sendline(f"cd {path}")
         server_ter.prompt()
         print("setup env")
-        cmd = self.aosp_conf['setup_env']
-        server_ter.sendline(f"{cmd['1']}")
+        server_ter.sendline("source build/envsetup.sh")
         sleep(5)
-        server_ter.sendline(f"{cmd['2']}")
+        server_ter.sendline("lunch aosp_rpi3-eng")
         server_ter.expect("TARGET_PRODUCT=aosp_rpi3", timeout=500)
         server_ter.prompt()
         print("plug sdcard to server")
         self.switch.mode_host()
         print("check disk name")
         found = 0
-        for disk in self.aosp_conf["list_sdcard"]:
+        list_sdcard = ["sda", "sdb", "sdc", "sdd"]
+        for disk in list_sdcard:
             try:
                 server_ter.sendline(f"sudo fdisk -l /dev/{disk}")
                 i = server_ter.expect(["password", "sdmux HS-SD/MMC"], timeout=2)
@@ -150,7 +148,7 @@ class rpi_aosp():
             raise ex
         sleep(10)
         print(f"flash image to /dev/{disk}")
-        cmd = f"{self.aosp_conf['flash_script']} {disk}"
+        cmd = f"scripts/write-sdcard-rpi3.sh {disk}"
         print(cmd)
         try:
             server_ter.sendline(cmd)
