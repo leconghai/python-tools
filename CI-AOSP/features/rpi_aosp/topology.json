@@ -50,7 +50,7 @@
   "sdmux": {
     "1": {
       "server": "153",
-      "device": "/dev/usb-sd-mux/id-000000000744"
+      "device": "/dev/usb-sd-mux/id-000000002490"
     }
   }
 }

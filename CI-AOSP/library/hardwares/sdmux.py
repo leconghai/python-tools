@@ -10,7 +10,7 @@ class SDmux(Ssh_tool):
         self.ID = device_file
         self.wait_time = 1
         self.wait_mount = 3
-        self.root_cmd(self.ter, f"sudo usbsdmux {self.ID} get", ["password", "dut", "host", "off"])
+        self.root_cmd(self.ter, f"sudo usbsdmux {self.ID} get", ["dut", "host", "off"])
         print(f"sdmux available")
 
     def mode_dut(self):

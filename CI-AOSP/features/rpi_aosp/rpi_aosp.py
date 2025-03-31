@@ -18,7 +18,7 @@ class rpi_aosp:
         self.ip_addr = board_conf["ip_addr"]
         self.account = board_conf["account"]
         if log_path is None:
-            log_path = f"{DIR_OUT}/board_{board_id}/"
+            log_path = f"{DIR_OUT}/rpi_aosp/board_{board_id}/"
         self.log_path = log_path
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
         log_reset = open(f'{log_path}/reset.txt', 'w+')
@@ -45,7 +45,16 @@ class rpi_aosp:
         server_ter = self.server.create_ter(log_server)
         # check docker and start command
         print("check docker and start container")
-        server_ter.send_expect("docker ps", "aosp-server")
+        # server_ter.send_expect("docker ps", "aosp-server")
+        try:
+            server_ter.sendline("docker ps")
+            i = server_ter.expect([pexpect.TIMEOUT, "aosp-server"])
+            if i == 0:
+                server_ter.sendline("docker-devops")
+                server_ter.expect("aosp-server")
+        except pexpect.ExceptionPexpect as ex:
+            server_ter.prompt()
+            raise ex
         server_ter.send_expect("docker-aosp", "aosp")
         # build kernel
         print("build kernel and dts")
@@ -66,7 +75,7 @@ class rpi_aosp:
         server_ter.send_expect("cdaosp", "/pi3")
         server_ter.sendline("source build/envsetup.sh")
         sleep(5)
-        server_ter.send_expect("lunch aosp_rpi3-eng", "OUT_DIR=out", timeout=600)
+        server_ter.send_expect("lunch aosp_rpi3-eng", "OUT_DIR=out", timeout=1200)
         sleep(2)
         server_ter.send_expect("make bootimage -j 6", "build completed successfully", timeout=600)
         server_ter.sendline("sync")
