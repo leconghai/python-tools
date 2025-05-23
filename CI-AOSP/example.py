@@ -3,6 +3,7 @@ from time import sleep
 
 
 from features.rpi_aosp.rpi_aosp import rpi_aosp
+from features.rpi_yocto.rpi_yocto import rpi_yocto
 
 DIR = sys.path[0]
 DIR_OUT = f"{DIR}/../logfile/"
@@ -12,7 +13,7 @@ DIR_OUT = f"{DIR}/../logfile/"
 # sudo systemctl status isc-dhcp-server.service
 
 if __name__ == '__main__':
-    board_rpi_aosp = rpi_aosp(board_id="1", server_id="153")
+    board_rpi_aosp = rpi_yocto(board_id="1", server_id="153")
 
     while 1:
         mode = ""
@@ -23,6 +24,7 @@ if __name__ == '__main__':
                 board_rpi_aosp.flash_all_image()
             case "setup":
                 board_rpi_aosp.startup_config()
+                break
             case "all":
                 board_rpi_aosp.flash_all_image()
                 board_rpi_aosp.startup_config()

@@ -5,7 +5,7 @@ import sys
 class Configs:
     DIR = sys.path[0]
     ROOT_DIR = f"{DIR}"
-    config_topo_path = f"{ROOT_DIR}/features/rpi_aosp/topology.json"
+    config_topo_path = f"{ROOT_DIR}/features/rpi_yocto/topology.json"
     json_topo = None
 
     @classmethod

@@ -57,13 +57,13 @@ class Ssh_raw:
             raise ex
         return ter
 
-    def root_cmd(self, ter, command, expects=None):
+    def root_cmd(self, ter, command, expects=None, timeout=1):
         list_expect = ["password"]
         if expects is not None:
             list_expect.extend(expects)
         try:
             ter.sendline(command)
-            i = ter.expect(list_expect)
+            i = ter.expect(list_expect, timeout=timeout)
             if i == 0:
                 ter.sendline(self.password)
                 if expects is not None:

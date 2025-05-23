@@ -9,13 +9,13 @@ class Relay(Ssh_tool):
         self.ter = self.create_ter(log_file)
         self.ID = device_id
         self.wait_time = 1
-        self.root_cmd(self.ter, f"sudo hidusb-relay-cmd state", [self.ID])
+        self.root_cmd(self.ter, f"sudo usbrelay", [self.ID])
         print(f"relay available")
 
     def p_off(self, port):
-        self.root_cmd(self.ter, f"sudo hidusb-relay-cmd ID={self.ID} OFF {port}", [self.ter.PROMPT])
+        self.root_cmd(self.ter, f"sudo usbrelay {self.ID}_{port}=0", [self.ter.PROMPT])
         sleep(self.wait_time)
 
     def p_on(self, port):
-        self.root_cmd(self.ter, f"sudo hidusb-relay-cmd ID={self.ID} ON {port}", [self.ter.PROMPT])
+        self.root_cmd(self.ter, f"sudo usbrelay {self.ID}_{port}=1", [self.ter.PROMPT])
         sleep(self.wait_time)
